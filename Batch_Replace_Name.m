@@ -1,10 +1,10 @@
 % when I rename the tiff files, I stupidly convert all 'part1' and
 % 'part2' to 'line1'
-cd 'C:\Users\yycxx\Documents\LOT_sections\' %先将工作目录切换到目标文件夹下
-oldstr = 'ACCK';
-newstr = 'CCK';
+cd 'Z:\Xiaochen\IMG_backup\LSM780\Gene_Expression\Virus\ArchTeGFP\' %先将工作目录切换到目标文件夹下
+oldstr = 'Tbx3';
+newstr = 'Tbx_3';
 % file = dir(['*.czi']) %找到所有的xlsx文件
-
+file = dir()
 % d = dir; % find all subfolders
 % dfolders = d([d(:).isdir]) ;
 % dfolders = dfolders(~ismember({dfolders(:).name},{'.','..'}));

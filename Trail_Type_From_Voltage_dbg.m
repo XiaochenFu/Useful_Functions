@@ -1,4 +1,4 @@
-function [trail_onset,trail_type] = Trail_Type_From_voltage(voltage, threshold, fs, varargin)
+function [trail_onset,trail_type] = Trail_Type_From_Voltage_dbg(voltage, threshold, fs, varargin)
 % [trail_onset,trail_type] = Trail_Type_From_voltage(voltage, threshold)
 % by xiaochen fu
 % Convert voltage data to trail type using threshold. 
@@ -22,6 +22,7 @@ t = (1:length(voltage))/fs;
 trail_onset = [];
 trail_offset = [];
 trail_type = [];
+trail_duration_second = [];
 for jj = 1:number_trail_type
     threshold_low = threshold(jj);
     if jj == number_trail_type
@@ -30,31 +31,36 @@ for jj = 1:number_trail_type
         threshold_high = threshold(jj+1);
     end
     voltage_copy = voltage;
-    % ignore the other parts
-    voltage_copy(voltage>threshold_high) = 0;
-    voltage_copy(voltage<threshold_low) = 0;
-    voltage_jj_bi = sign(voltage_copy);
+    voltage_copy(voltage>threshold_high) = threshold_low;
+    voltage_copy(voltage<threshold_low) = threshold_low;
+    voltage_jj_bi = sign(voltage_copy-threshold_low);
     % find when data change
-    voltage_jj_bi_diff = diff(voltage_jj_bi);
-    voltage_jj_onset_index = find((voltage_jj_bi_diff>0));
-    trail_onset_jj = t(voltage_jj_onset_index);
-    trail_onset = [trail_onset,trail_onset_jj];
-    voltage_jj_offset_index = find((voltage_jj_bi_diff<0));
-    trail_offset_jj = t(voltage_jj_offset_index);
-    trail_offset = [trail_offset,trail_offset_jj];
-    trail_type_jj = ones(1, length(trail_onset_jj))*jj;
+%     [pks,locs,w,p] = findpeaks(voltage_copy,fs,'MinPeakHeight',threshold_low);
+    [pks,locs,w,p] = findpeaks(voltage_jj_bi,fs,'MinPeakHeight',0.5);
+    %     voltage_jj_bi_diff = diff(voltage_jj_bi);
+    %     voltage_jj_onset_index = find((voltage_jj_bi_diff>0));
+    %     trail_onset_jj = t(voltage_jj_onset_index);
+    %     trail_onset = [trail_onset,trail_onset_jj];
+    trail_onset = [trail_onset locs];
+    trail_duration_second = [trail_duration_second w];
+    %     voltage_jj_offset_index = find((voltage_jj_bi_diff<0));
+    %     trail_offset_jj = t(voltage_jj_offset_index);
+    %     trail_offset = [trail_offset,trail_offset_jj];
+    %     trail_type_jj = ones(1, length(trail_onset_jj))*jj;
+    %     trail_type = [trail_type,trail_type_jj];
+    trail_type_jj = ones(1, length(locs))*jj;
     trail_type = [trail_type,trail_type_jj];
 end
 
-if length(trail_offset)>length(trail_onset)
-    trail_onset = [1 trail_onset];
-end
-if length(trail_offset)<length(trail_onset)
-    trail_offset = [trail_offset length(voltage)];
-end
+% if length(trail_offset)>length(trail_onset)
+%     trail_onset = [1 trail_onset];
+% end
+% if length(trail_offset)<length(trail_onset)
+%     trail_offset = [trail_offset length(voltage)];
+% end
  if nargin ==4
      min_pulse_duration = varargin{1};
-     trail_duration_second = trail_offset-trail_onset;
+%      trail_duration_second = trail_offset-trail_onset;
      trail_onset(trail_duration_second<min_pulse_duration) = [];
      trail_type(trail_duration_second<min_pulse_duration) = [];
      % sort data according to time
@@ -64,7 +70,7 @@ end
   if nargin ==5
      min_pulse_duration = varargin{1};
      min_trail_duration = varargin{2};
-     trail_duration_second = trail_offset-trail_onset;
+%      trail_duration_second = trail_offset-trail_onset;
      trail_onset(trail_duration_second<min_pulse_duration) = [];
      trail_type(trail_duration_second<min_pulse_duration) = [];
      % sort data according to time

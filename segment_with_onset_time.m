@@ -15,23 +15,47 @@ function [x1_all,trigger_time_remained] = segment_with_onset_time(Voltage, timep
 %     trigger_time_remained: remained onset
 
 % Build an empty matrix for store result.
-itv = timepoint(2)-timepoint(1);
-Number_Dots = floor((window(2)-window(1))/itv)-1;
-x1_all = zeros(Number_Dots,length(trigger_time));
-trigger_time_remained = zeros(length(trigger_time),1);
-for i = 1:length(trigger_time)
-    index = timepoint>(trigger_time(i)+window(1)) & timepoint<(trigger_time(i)+window(2));
-    if sum(index)<Number_Dots
-        trigger_time_remained(i) = NaN;
-        x1_all(:,i) = NaN;
-    else
-        trigger_time_remained(i) = 1;
-        v0 = Voltage(index,:);
-        x1_all(:,i) = v0(1:Number_Dots);
+num_channels = size(Voltage,2);
+if num_channels == 1
+    itv = timepoint(2)-timepoint(1);
+    Number_Dots = floor((window(2)-window(1))/itv)-1;
+    x1_all = zeros(Number_Dots,length(trigger_time));
+    trigger_time_remained = zeros(length(trigger_time),1);
+    for i = 1:length(trigger_time)
+        index = timepoint>(trigger_time(i)+window(1)) & timepoint<(trigger_time(i)+window(2));
+        if sum(index)<Number_Dots
+            trigger_time_remained(i) = NaN;
+            x1_all(:,i) = NaN;
+        else
+            trigger_time_remained(i) = trigger_time(i);
+            v0 = Voltage(index,:);
+            x1_all(:,i) = v0(1:Number_Dots);
+        end
+
     end
-    
+    % Remove those NAN
+    x1_all(:,isnan(trigger_time_remained)) = [];
+    trigger_time_remained(isnan(trigger_time_remained)) = [];
+
+else
+ itv = timepoint(2)-timepoint(1);
+    Number_Dots = floor((window(2)-window(1))/itv)-1;
+    x1_all = zeros(Number_Dots,num_channels,length(trigger_time));
+    trigger_time_remained = zeros(length(trigger_time),1);
+    for i = 1:length(trigger_time)
+        index = timepoint>(trigger_time(i)+window(1)) & timepoint<(trigger_time(i)+window(2));
+        if sum(index)<Number_Dots
+            trigger_time_remained(i) = NaN;
+            x1_all(:,i) = NaN;
+        else
+            trigger_time_remained(i) = 1;
+            v0 = Voltage(index,:);
+            x1_all(:,:,i) = v0(1:Number_Dots,:);
+        end
+
+    end
+    % Remove those NAN
+    x1_all(:,isnan(trigger_time_remained)) = [];
+    trigger_time_remained(isnan(trigger_time_remained)) = [];
 end
-% Remove those NAN
-x1_all(:,isnan(trigger_time_remained)) = [];
-trigger_time_remained(isnan(trigger_time_remained)) = [];
 end

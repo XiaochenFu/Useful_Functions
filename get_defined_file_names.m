@@ -34,7 +34,7 @@ if contains(Description,'last','IgnoreCase',true)&& (~processflag)
     %Filter out all the folders.
     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     %I contains the index to the biggest number which is the latest file
-    [~,I] = sort([dirc(:).datenum]);
+    [~,I] = sort([dirc(:).datenum],"descend"); % later created files have larger datenum
     if length(I)>=num_files
         filenames = extractfield(dirc(I(1:num_files)),'name');
     end
