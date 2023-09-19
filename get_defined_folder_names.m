@@ -106,7 +106,7 @@ end
 if processflag ==0
     dirc = dir(folder);
     %Filter out all the non-folders.
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name}))); dirc = dirc(3:end);
+    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name}))); %dirc = dirc(3:end);
     foldernames = extractfield(dirc,'name');
     if any(contains(foldernames,Description))
         foldernames = extractfield(dirc(contains(foldernames,Description)),'name');
