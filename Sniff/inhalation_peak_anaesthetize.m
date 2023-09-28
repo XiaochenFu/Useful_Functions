@@ -1,4 +1,5 @@
-function [sniff_onset] = sniff_trigger_riseedge_anaesthetize(sniff_voltage, trigger_threshold, fs, minimum_sniff_duration_second)
+function [inh_pks] = inhalation_peak_anaesthetize(sniff_voltage, trigger_threshold, fs, minimum_sniff_duration_second)
+% addapted from sniff_trigger_riseedge_anaesthetize
 % sniff_phase = zeros(size(sniff_voltage));
 sniff_onset = [];
 trail_offset = [];
@@ -51,22 +52,19 @@ trail_offset = [trail_offset,trail_offset_jj];
 
 % method 3: find peak and search the nearest cross
 [~,inh_pks] = findpeaks(sniff_voltage, fs,'MinPeakDistance',minimum_sniff_duration_second,'MinPeakHeight',3.75);
-trail_onset_pulse_train = [];
-current_onset_pulse_train = sniff_onset(end);
-
-for ii = 1:(length(inh_pks))
-    inh_pk = inh_pks(length(inh_pks)+1-ii);
-    % find the nearest threshold crossing at left of the peak
-    d = inh_pk-sniff_onset;
-    d(d<0) = nan;
-    if all(isnan(d))
-    else
-        [~,iiddxx]=min(d,[],'omitnan');
-        current_onset_pulse_train=sniff_onset(iiddxx);
-        trail_onset_pulse_train = [current_onset_pulse_train trail_onset_pulse_train];
-    end
-end
-sniff_onset = trail_onset_pulse_train;
+% trail_onset_pulse_train = []
+% current_onset_pulse_train = sniff_onset(end);
+% 
+% for ii = 1:(length(inh_pks))
+%     inh_pk = inh_pks(length(inh_pks)+1-ii);
+%     % find the nearest threshold crossing at left of the peak
+%     d = inh_pk-sniff_onset;
+%     d(d<0) = nan;
+%     [~,iiddxx]=min(d,[],'omitnan');
+%     current_onset_pulse_train=sniff_onset(iiddxx);
+%     trail_onset_pulse_train = [current_onset_pulse_train trail_onset_pulse_train];
+% end
+% sniff_onset = trail_onset_pulse_train;
 
 
 % show result
@@ -82,8 +80,8 @@ if exist("showplot")
         end
         plot(t, sniff_voltage)
         hold on
-        for ii  = 1:length(sniff_onset)
-            xline(sniff_onset(ii),'--');,hold on
+        for ii  = 1:length(inh_pks)
+            xline(inh_pks(ii),'--');,hold on
             %             y1=get(gca,'ylim');
             hold on
             %             plot([sniff_onset(ii) sniff_onset(ii)],y1);
