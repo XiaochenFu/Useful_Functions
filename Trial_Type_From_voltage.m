@@ -8,7 +8,7 @@ function [trial_onset,trial_type] = Trail_Type_From_voltage(voltage, threshold, 
 % signal below baseline is defined as baseline
 % signal between thre 1 and thre 2 are defined as trial type 1
 % fs: sampling rate
-% varargin: minimum pulse duration in second, 
+% varargin: minimum pulse duration in second
 %% output 
 % trial_onset in second
 % trial_type from 1 to n
@@ -36,10 +36,10 @@ for jj = 1:number_trial_type
     voltage_jj_bi = sign(voltage_copy);
     % find when data change
     voltage_jj_bi_diff = diff(voltage_jj_bi);
-    voltage_jj_onset_index = find((voltage_jj_bi_diff>0));
+    voltage_jj_onset_index = (voltage_jj_bi_diff>0);
     trial_onset_jj = t(voltage_jj_onset_index);
     trial_onset = [trial_onset,trial_onset_jj];
-    voltage_jj_offset_index = find((voltage_jj_bi_diff<0));
+    voltage_jj_offset_index = (voltage_jj_bi_diff<0);
     trial_offset_jj = t(voltage_jj_offset_index);
     trial_offset = [trial_offset,trial_offset_jj];
     trial_type_jj = ones(1, length(trial_onset_jj))*jj;
@@ -87,7 +87,7 @@ end
      end
      trial_onset = trial_onset_pulse_train;
      trial_type = trial_type_pulse_train;
-     if exist("threshold0")
+     if exist("threshold0","var")
          trial_onset = [1 trial_onset];
          trial_type = [0 trial_type];
          trial_type = trial_type+1;
@@ -95,7 +95,7 @@ end
   end
   
   global showplot
-  if exist('showplot') % show result if necessary. 
+  if exist('showplot','var') % show result if necessary. 
       if showplot
           
           newDefaultColors = jet(number_trial_type);
