@@ -51,14 +51,13 @@ if strcmpi(Description,'today')&& (~processflag)
     filenames = extractfield(dirc(idx),'name');
     processflag = 1;
 end
-% only files created yesterday
+
+% % only files created yesterday
 if strcmpi(Description,'yesterday')&& (~processflag)
     dirc = dir(folder);
-    %Filter out all the folders.
     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
-    %I contains the index to the biggest number which is the latest file
-    date_creat = extractfield(dirc,'datenum');
-    idx = date_creat>datenum(datetime('yesterday'));
+    date_creat = datetime(extractfield(dirc,'datenum'),'ConvertFrom','datenum');
+    idx = (date_creat > datetime('yesterday')) & (date_creat < datetime('today'));
     filenames = extractfield(dirc(idx),'name');
     processflag = 1;
 end
@@ -70,7 +69,7 @@ if strcmpi(Description,'All')&& (~processflag)
 end
 
 % files created on a defined date
-if contains(Description,digitsPattern(6,8))
+if contains(Description,digitsPattern(6,8)) && (~processflag)
     dignum = count(Description,digitsPattern(1));
     dt = extract(Description,digitsPattern);
     dt = dt{1};
@@ -94,12 +93,12 @@ if contains(Description,digitsPattern(6,8))
     %Filter out all the folders.
     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     %I contains the index to the biggest number which is the latest file
-    date_creat = datetime(extractfield(dirc,'date'));
-    timetotarget = arrayfun(@between,date_creat,repmat(datetime(YY,MM,DD),1,length(date_creat))); repmat("time",1,length(date_creat));
-    fidx = (caldays(timetotarget)==0);
-    filenames = extractfield(dirc(fidx),'name');
-    %     date_creat = datetime(extractfield(dirc,'date'));
-    %     arrayfun(@isbetween,date_creat,repmat(datetime(YY,MM,DD),1,length(date_creat)),repmat(datetime(YY,MM,DD),1,length(date_creat)),repmat(datetime(YY,MM,DD)+caldays(1),1,length(date_creat)));
+    date_creat = datetime(extractfield(dirc,'datenum'),'ConvertFrom','datenum');
+    target_date = datetime(YY, MM, DD);
+    idx = (date_creat >= target_date) & (date_creat < target_date + days(1));
+    filenames = extractfield(dirc(idx),'name');
+    
+
     processflag = 1;
 end
 % try as key word
