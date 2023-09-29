@@ -32,7 +32,8 @@ if contains(Description,'last','IgnoreCase',true)&& (~processflag)
     num_files = str2num(cell2mat(extract(Description,digitsPattern)));
     dirc = dir(folder);
     %Filter out all the folders.
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
+%     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     %I contains the index to the biggest number which is the latest file
     [~,I] = sort([dirc(:).datenum],"descend"); % later created files have larger datenum
     if length(I)>=num_files
@@ -44,7 +45,8 @@ end
 if strcmpi(Description,'today')&& (~processflag)
     dirc = dir(folder);
     %Filter out all the folders.
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
+%     dirc = dirc(~cellfun(@isfolder,{dirc(:).name}));
     %I contains the index to the biggest number which is the latest file
     date_creat = extractfield(dirc,'datenum');
     idx = date_creat>datenum(datetime('today'));
@@ -55,7 +57,8 @@ end
 % % only files created yesterday
 if strcmpi(Description,'yesterday')&& (~processflag)
     dirc = dir(folder);
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
+%     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     date_creat = datetime(extractfield(dirc,'datenum'),'ConvertFrom','datenum');
     idx = (date_creat > datetime('yesterday')) & (date_creat < datetime('today'));
     filenames = extractfield(dirc(idx),'name');
@@ -64,6 +67,7 @@ end
 
 if strcmpi(Description,'All')&& (~processflag)
     dirc = dir(folder);
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
     filenames = extractfield(dirc,'name');
     processflag = 1;
 end
@@ -91,7 +95,8 @@ if contains(Description,digitsPattern(6,8)) && (~processflag)
     DD = str2num(DD);
     dirc = dir(folder);
     %Filter out all the folders.
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
+%     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     %I contains the index to the biggest number which is the latest file
     date_creat = datetime(extractfield(dirc,'datenum'),'ConvertFrom','datenum');
     target_date = datetime(YY, MM, DD);
@@ -105,7 +110,8 @@ end
 if processflag ==0
     dirc = dir(folder);
     %Filter out all the folders.
-    dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
+    dirc = dirc(~[dirc(:).isdir]); % filter out non-folders
+%     dirc = dirc(find(~cellfun(@isdir,{dirc(:).name})));
     filenames = extractfield(dirc,'name');
     if any(contains(filenames,Description))
         filenames = extractfield(dirc(contains(filenames,Description)),'name');
