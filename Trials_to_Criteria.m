@@ -1,17 +1,19 @@
 % find the number of trails to reach a criterion
 function [num_trial_to_criterion] = Trials_to_Criteria(Behaviour_Info_cat,criteria)
 % %% load the test data
-% 
+%
 % cc
 % load('C:\Users\yycxx\OneDrive - OIST\Thesis\Behaviour\Group_Analyses\Learning_Curve_Injection_Strain\1spot_cck\BehaviourData_Cat\CCK_168\Odour1.mat')
-% 
+%
 % criteria.test_method = "dprime";
 % criteria.test_threshold = 2.5;
+% criteria.drpime_function = @Dprime_Loglinear_norm50;
 % % criteria.test_method = "accuracy";
 % % criteria.test_threshold = 0.8;
 % criteria.num_trials_for_test = 40;
 % criteria.num_trials_steps = 5;
-% % [num_trial_to_criterion] = Trials_to_Criteria(criteria)
+% criteria.failexpression = 'nan';
+% % [num_trial_to_criterion] = Trials_to_Criteria(Behaviour_Info_cat, criteria)
 %%
 Response = extractfield(Behaviour_Info_cat , 'Response');
 TrialType = extractfield(Behaviour_Info_cat , 'TrialType');
@@ -23,6 +25,7 @@ test_method = getOr(criteria, "test_method", "dprime");
 num_trials_for_test = getOr(criteria, "num_trials_for_test", 40);
 num_trials_steps = getOr(criteria, "num_trials_steps", 10);
 drpime_function = getOr(criteria, "drpime_function", @Dprime_Loglinear_norm50);
+failexpression = getOr(criteria, "failexpression", 'nan');
 switch test_method
     case "accuracy"
         test_threshold = getOr(criteria, "test_threshold", 80);
@@ -60,7 +63,12 @@ for i = 1:window_steps:(total_length - window_width + 1)
     end
 end
 if ~exist("num_trial_to_criterion","var")
-    num_trial_to_criterion = -total_length;
+    switch failexpression
+        case 'minus'
+            num_trial_to_criterion = -total_length;
+        case 'nan'
+            num_trial_to_criterion = nan;
+    end
 end
 
 
