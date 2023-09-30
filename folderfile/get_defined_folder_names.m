@@ -48,7 +48,7 @@ if strcmpi(Description,'today')&& (~processflag)
     dirc = dirc([dirc(:).isdir]); % filter out non-folders 
     date_creat = extractfield(dirc,'datenum');
     idx = date_creat>datenum(datetime('today'));
-    filenames = extractfield(dirc(idx),'name');
+    foldernames = extractfield(dirc(idx),'name');
     processflag = 1;
 end
 
@@ -59,7 +59,7 @@ if strcmpi(Description,'yesterday')&& (~processflag)
     dirc = dirc([dirc(:).isdir]); % filter out non-folders 
     date_creat = datetime(extractfield(dirc,'datenum'),'ConvertFrom','datenum');
     idx = (date_creat > datetime('yesterday')) & (date_creat < datetime('today'));
-    filenames = extractfield(dirc(idx),'name');
+    foldernames = extractfield(dirc(idx),'name');
     processflag = 1;
 end
 
